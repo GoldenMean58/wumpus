@@ -23,6 +23,7 @@ public:
   TriState is_wumpus;
   TriState is_pit;
   TriState is_safe;
+  TriState is_player;
   Block();
 };
 

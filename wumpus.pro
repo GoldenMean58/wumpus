@@ -33,7 +33,8 @@ SOURCES += \
     Pit.cpp \
     Player.cpp \
     Wumpus.cpp \
-    drawboard.cpp
+    drawboard.cpp \
+    GameQt.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -43,7 +44,8 @@ HEADERS += \
     Pit.h \
     Player.h \
     Wumpus.h \
-    drawboard.h
+    drawboard.h \
+    GameQt.h
 
 FORMS += \
         mainwindow.ui
