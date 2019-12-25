@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/resource/image">
+        <file>Brave.png</file>
+        <file>wumpus.png</file>
+        <file>pit.png</file>
+        <file>stench.png</file>
+        <file>breeze.png</file>
+        <file>gold.png</file>
+    </qresource>
+</RCC>
