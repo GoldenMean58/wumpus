@@ -80,6 +80,11 @@ int Player::move() {
   this->_y += this->_dy;
   return 0;
 }
+int Player::move_to(int x, int y) {
+  this->_x = x;
+  this->_y = y;
+  return 0;
+}
 int Player::shoot() {
   this->_arrow_count--;
   return 0;
@@ -95,6 +100,7 @@ void Player::init() {
   _dy = 0;
   _is_grab_gold = false;
   _action_count = 0;
+  is_dead = false;
 }
 Player::Player() : _arrow_count(1) { init(); }
 Player::Player(int arrow_count) : _arrow_count(arrow_count) { init(); }

@@ -3,18 +3,22 @@
 Game::Game()
     : _game_map(nullptr), _width(4), _height(4), _player(new Player()),
       _wumpus(nullptr), _wumpus_count(0), _pit(nullptr), _pit_count(0),
-      _gold_x(0), _gold_y(0), DEFAULT_ARROW_COUNT(1), DEFAULT_PITS_COUNT(3) {
+      _gold_x(0), _gold_y(0), _is_over(false), _arrow_count(1),
+      DEFAULT_ARROW_COUNT(1), DEFAULT_PITS_COUNT(3) {
   srand((unsigned int)time(nullptr));
 }
 Game::~Game() { destroy_map(); }
-Game::Game(int width, int height, int arrow_count, int pit_count)
-    : _game_map(nullptr), _width(width), _height(height),
+Game::Game(int **game_map, int width, int height, int arrow_count,
+           int pit_count)
+    : _game_map(game_map), _width(width), _height(height),
       _player(new Player(arrow_count)), _wumpus(nullptr), _wumpus_count(0),
-      _pit(nullptr), _pit_count(0), _gold_x(0), _gold_y(0),
-      DEFAULT_ARROW_COUNT(arrow_count), DEFAULT_PITS_COUNT(pit_count) {
+      _pit(nullptr), _pit_count(0), _gold_x(0), _gold_y(0), _is_over(false),
+      _arrow_count(arrow_count), DEFAULT_ARROW_COUNT(arrow_count),
+      DEFAULT_PITS_COUNT(pit_count) {
   srand((unsigned int)time(nullptr));
 }
 void Game::generate_map() {
+  _is_over = false;
   if (_player) {
     delete _player;
     _player = new Player(DEFAULT_ARROW_COUNT);
@@ -30,28 +34,28 @@ void Game::generate_map() {
     }
   }
   _pit = new Pit[DEFAULT_PITS_COUNT];
-  for (int i = 0; i < DEFAULT_PITS_COUNT; ++i) {
-    int index = (rand() + 1) % (_width * _height);
+  while (_pit_count < DEFAULT_PITS_COUNT) {
+    int index = rand() % (_width * _height - 1) + 1;
     if (_game_map[index / _width][index % _width] != (int)ObjectType::None) {
-      --i;
       continue;
     }
+    if (index == 0)
+      cout << "No" << endl;
     _game_map[index / _width][index % _width] = (int)ObjectType::PitType;
-    _pit[i].set_x(index / _width);
-    _pit[i].set_y(index % _width);
+    _pit[_pit_count].set_x(index / _width);
+    _pit[_pit_count].set_y(index % _width);
     _pit_count++;
   }
   _wumpus = new Wumpus[DEFAULT_ARROW_COUNT];
-  for (int i = 0; i < DEFAULT_ARROW_COUNT; ++i) {
-    int index = (rand() + 1) % (_width * _height);
+  while (_wumpus_count < DEFAULT_ARROW_COUNT) {
+    int index = rand() % (_width * _height - 1) + 1;
     if (_game_map[index / _width][index % _width] != (int)ObjectType::None) {
-      --i;
       continue;
     }
     // FIXME: pit block overwrite
     _game_map[index / _width][index % _width] = (int)ObjectType::WumpusType;
-    _wumpus[i].set_x(index / _width);
-    _wumpus[i].set_y(index % _width);
+    _wumpus[_wumpus_count].set_x(index / _width);
+    _wumpus[_wumpus_count].set_y(index % _width);
     _wumpus_count++;
   }
   while (true) {
@@ -85,6 +89,7 @@ void Game::destroy_map() {
 }
 
 void Game::smell(int x, int y) {
+  auto res = Event::None;
   for (int i = 0; i < _wumpus_count; ++i) {
     int wumpus_x = _wumpus[i].get_x();
     int wumpus_y = _wumpus[i].get_y();
@@ -92,7 +97,7 @@ void Game::smell(int x, int y) {
     if (((abs(x - wumpus_x) == 1 && y - wumpus_y == 0) ||
          (abs(y - wumpus_y) == 1 && x - wumpus_x == 0)) &&
         !wumpus_dead) {
-      auto res = Event::SmellWumpus;
+      res = Event::SmellWumpus;
       event_handler(res);
     }
   }
@@ -101,17 +106,114 @@ void Game::smell(int x, int y) {
     int pit_y = _pit[i].get_y();
     if ((abs(x - pit_x) == 1 && y - pit_y == 0) ||
         (abs(y - pit_y) == 1 && x - pit_x == 0)) {
-      auto res = Event::SmellPit;
+      res = Event::SmellPit;
       event_handler(res);
     }
   }
   if (_gold_x == x && _gold_y == y) {
-    auto res = Event::MeetGold;
+    res = Event::MeetGold;
     event_handler(res);
+  }
+  if (res == Event::None)
+    event_handler(res);
+}
+bool Game::is_over() { return _is_over; }
+Event Game::move(int from_x, int from_y, int x, int y) {
+  Event res = Event::InvalidAction;
+  if (!(x < 0 || x >= _height || y < 0 || y > _width)) {
+    _game_map[from_x][from_y] = (int)ObjectType::None;
+    _player->move_to(x, y);
+    res = Event::Arrived;
+    event_handler(res);
+    _game_map[x][y] = (int)ObjectType::PlayerType;
+    for (int i = 0; i < _wumpus_count; ++i) {
+      int wumpus_x = _wumpus[i].get_x();
+      int wumpus_y = _wumpus[i].get_y();
+      bool wumpus_dead = _wumpus[i].is_dead();
+      if (x == wumpus_x && y == wumpus_y && !wumpus_dead) {
+        res = Event::EatenByWumpus;
+        event_handler(res);
+        res = Event::Dead;
+        _player->is_dead = true;
+        event_handler(res);
+        res = Event::GameOver;
+        _is_over = true;
+        event_handler(res);
+        break;
+      }
+    }
+    for (int i = 0; i < _pit_count; ++i) {
+      int pit_x = _pit[i].get_x();
+      int pit_y = _pit[i].get_y();
+      if (x == pit_x && y == pit_y) {
+        res = Event::DropIntoPit;
+        event_handler(res);
+        res = Event::Dead;
+        _player->is_dead = true;
+        event_handler(res);
+        res = Event::GameOver;
+        _is_over = true;
+        event_handler(res);
+        break;
+      }
+    }
+    smell(x, y);
+  } else {
+    event_handler(res);
+  }
+  return res;
+}
+// enum class Direction : int { Up = 0, Down = 2, Left = 1, Right = 3 };
+void Game::set_direction(Direction new_direction) {
+  int dx, dy;
+  Direction old_direction = _player->get_direction(&dx, &dy);
+  int times = abs((int)old_direction - (int)new_direction);
+  for (int i = 0; i < times; ++i) {
+    _player->turn_left();
   }
 }
 
-Event Game::take_action(Action action) {
+void Game::print_map() {
+  cout << endl;
+  for (int x = 0; x < _height; ++x) {
+    for (int y = 0; y < _width; ++y) {
+      switch (_game_map[x][y]) {
+      case (int)ObjectType::None:
+        if ((x != _gold_x || y != _gold_y) || _player->is_grab_gold()) {
+          cout << ".";
+        } else {
+          cout << "#";
+        }
+        break;
+      case (int)ObjectType::PlayerType:
+        switch (_player->get_direction(nullptr, nullptr)) {
+        case Direction::Up:
+          cout << "^";
+          break;
+        case Direction::Down:
+          cout << "V";
+          break;
+        case Direction::Left:
+          cout << "<";
+          break;
+        case Direction::Right:
+          cout << ">";
+          break;
+        }
+        break;
+      case (int)ObjectType::WumpusType:
+        cout << "W";
+        break;
+      case (int)ObjectType::PitType:
+        cout << "P";
+        break;
+      }
+    }
+    cout << endl;
+  }
+}
+Event Game::take_action(Action action, int *data) {
+  print_map();
   Event res = Event::InvalidAction;
   int x = _player->get_x();
   int y = _player->get_y();
@@ -131,6 +233,7 @@ Event Game::take_action(Action action) {
       res = Event::Leaved;
       event_handler(res);
       res = Event::GameOver;
+      _is_over = true;
       event_handler(res);
     } else {
       event_handler(res);
@@ -141,39 +244,7 @@ Event Game::take_action(Action action) {
     _player->get_direction(&dx, &dy);
     x = _player->get_x() + dx;
     y = _player->get_y() + dy;
-    if (!(x < 0 || x >= _height || y < 0 || y > _width)) {
-      _game_map[bak_x][bak_y] = (int)ObjectType::None;
-      _player->move();
-      _game_map[x][y] = (int)ObjectType::PlayerType;
-      res = Event::None;
-      event_handler(res);
-      for (int i = 0; i < _wumpus_count; ++i) {
-        int wumpus_x = _wumpus[i].get_x();
-        int wumpus_y = _wumpus[i].get_y();
-        bool wumpus_dead = _wumpus[i].is_dead();
-        if (x == wumpus_x && y == wumpus_y && !wumpus_dead) {
-          res = Event::EatenByWumpus;
-          event_handler(res);
-          res = Event::GameOver;
-          event_handler(res);
-          break;
-        }
-      }
-      for (int i = 0; i < _pit_count; ++i) {
-        int pit_x = _pit[i].get_x();
-        int pit_y = _pit[i].get_y();
-        if (x == pit_x && y == pit_y) {
-          res = Event::DropIntoPit;
-          event_handler(res);
-          res = Event::GameOver;
-          event_handler(res);
-          break;
-        }
-      }
-      smell(x, y);
-    } else {
-      event_handler(res);
-    }
+    res = move(bak_x, bak_y, x, y);
     break;
   case Action::Shoot:
     if (_player->get_arrow_count() > 0) {
@@ -221,6 +292,14 @@ Event Game::take_action(Action action) {
     _player->turn_right();
     event_handler(res);
     break;
+  case Action::MoveTo:
+    if (data) {
+      int to_x = *data;
+      data++;
+      int to_y = *data;
+      move(x, y, to_x, to_y);
+    }
+    break;
   default:
     event_handler(res);
     break;
@@ -231,6 +310,6 @@ void Game::start() {
   if (!_game_map) {
     generate_map();
   }
-  smell(0, 0);
+  move(0, 0, 0, 0);
 }
 // virtual void event_handler(Event event) = 0;

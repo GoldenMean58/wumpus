@@ -29,6 +29,7 @@ enum class Action : int {
   Leave = 5,
   Smell = 6,
   None = 7,
+  MoveTo = 8,
 };
 
 enum class Event : int {
@@ -45,6 +46,7 @@ enum class Event : int {
   DropIntoPit = 10,
   SmellPit = 11,
   GameOver = 12,
+  Arrived = 13,
 };
 
 class Game {
@@ -59,6 +61,8 @@ protected:
   int _pit_count;
   int _gold_x;
   int _gold_y;
+  bool _is_over;
+  int _arrow_count;
   int DEFAULT_ARROW_COUNT;
   int DEFAULT_WIDTH;      // = 4;
   int DEFAULT_HEIGHT;     // = 4;
@@ -67,11 +71,15 @@ protected:
 public:
   Game();
   ~Game();
-  Game(int width, int height, int arrow_count, int pit_count);
+  Game(int **map, int width, int height, int arrow_count, int pit_count);
   void generate_map();
   void generate_map(int width, int height);
   void destroy_map();
-  Event take_action(Action action);
+  void print_map();
+  void set_direction(Direction);
+  bool is_over();
+  Event take_action(Action action, int *data = nullptr);
+  Event move(int from_x, int from_y, int x, int y);
   virtual void event_handler(Event event) = 0;
   void smell(int x, int y);
   void start();

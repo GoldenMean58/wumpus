@@ -1,7 +1,7 @@
 #ifndef MY_PLAYER_H
 #define MY_PLAYER_H
 #include "Object.h"
-enum class Direction : int { Up = 0, Down = 1, Left = 2, Right = 3 };
+enum class Direction : int { Up = 0, Down = 2, Left = 1, Right = 3 };
 constexpr int DEFAULT_ARROW_COUNT = 1;
 class Player : public Object {
 private:
@@ -14,6 +14,7 @@ private:
   int _state;
 
 public:
+  bool is_dead;
   void init();
   Player();
   Player(int arrow_count);
@@ -23,6 +24,7 @@ public:
   bool is_grab_gold();
   int get_state();
   int move();
+  int move_to(int x, int y);
   int shoot();
   int grab();
   void turn_left();
