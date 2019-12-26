@@ -48,6 +48,26 @@ enum class Event : int {
   GameOver = 12,
   Arrived = 13,
 };
+enum class TriState : int {
+  Unknown = 0,
+  Yes = 1,
+  No = 2,
+  Maybe = 3,
+};
+class Block {
+public:
+  TriState is_unknown;
+  TriState is_visited;
+  TriState is_breeze;
+  TriState is_stench;
+  TriState is_gold;
+  TriState is_wumpus;
+  TriState is_pit;
+  TriState is_safe;
+  TriState is_player;
+  Block();
+};
+
 
 class Game {
 protected:
@@ -63,10 +83,13 @@ protected:
   int _gold_y;
   bool _is_over;
   int _arrow_count;
+  Block **_information_map;
+  Block **_view_map;
   int DEFAULT_ARROW_COUNT;
   int DEFAULT_WIDTH;      // = 4;
   int DEFAULT_HEIGHT;     // = 4;
   int DEFAULT_PITS_COUNT; // = 3;
+  void _init();
 
 public:
   Game();
@@ -81,8 +104,11 @@ public:
   Event take_action(Action action, int *data = nullptr);
   Event move(int from_x, int from_y, int x, int y);
   virtual void event_handler(Event event) = 0;
+  Block **extract_map_info(bool debug = false);
   void smell(int x, int y);
   void start();
+  int get_gold_x();
+  int get_gold_y();
 };
 
 #endif

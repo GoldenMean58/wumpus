@@ -7,33 +7,11 @@
 using std::deque;
 using std::vector;
 
-enum class TriState : int {
-  Unknown = 0,
-  Yes = 1,
-  No = 2,
-  Maybe = 3,
-};
-class Block {
-public:
-  TriState is_unknown;
-  TriState is_visited;
-  TriState is_breeze;
-  TriState is_stench;
-  TriState is_gold;
-  TriState is_wumpus;
-  TriState is_pit;
-  TriState is_safe;
-  TriState is_player;
-  Block();
-};
-
 class Database : public Game {
 private:
-  Block **_origin_map;
-  Block **_information_map;
-  void _tell(Event event);
   bool _moveto(int x, int y);
-
+protected:
+  void _tell(Event event);
 public:
   // Update
   void event_handler(Event event) override; // Tell

@@ -7,6 +7,8 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QKeyEvent>
+#include <QCheckBox>
 
 namespace Ui {
 class MainWindow;
@@ -18,21 +20,24 @@ class MainWindow : public QMainWindow {
 public:
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
+  virtual void keyPressEvent(QKeyEvent*);
 
 private slots:
   void random_layout_btn_clicked(bool);
   void custom_layout_btn_clicked(bool);
   void ai_btn_clicked(bool);
-  Block **extract_map_info(int **map);
+  void debug_check_box_state_changed(int state);
 
 private:
   GameQt *game_qt;
   DrawBoard *db;
   QPushButton *random_layout_btn;
   QPushButton *custom_layout_btn;
+  QCheckBox *debug_check_box;
   QPushButton *ai_btn;
   QLayout *layout;
   Ui::MainWindow *ui;
+  bool is_debug = false;
 };
 
 #endif // MAINWINDOW_H

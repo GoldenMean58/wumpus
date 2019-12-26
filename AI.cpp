@@ -542,12 +542,6 @@ void Database::print_map() {
 }
 */
 
-Block::Block()
-    : is_unknown(TriState::Yes), is_visited(TriState::No),
-      is_breeze(TriState::Unknown), is_stench(TriState::Unknown),
-      is_gold(TriState::Unknown), is_wumpus(TriState::Unknown),
-      is_pit(TriState::Unknown), is_safe(TriState::Unknown) {}
-
 Action Database::ask(int *data) {
   int now_x = _player->get_x();
   int now_y = _player->get_y();
@@ -695,29 +689,8 @@ Database::Database() : Game() {}
 Database::Database(int **game_map, int height, int width, int arrow_count,
                    int pit_count)
     : Game(game_map, width, height, arrow_count, pit_count) {
-  _information_map = new Block *[height];
-  for (int i = 0; i < height; ++i) {
-    _information_map[i] = new Block[width];
-  }
-  _origin_map = new Block *[height];
-  for (int i = 0; i < height; ++i) {
-    _origin_map[i] = new Block[width];
-  }
 }
 
 Database::~Database() {
-  if (_information_map) {
-    for (int i = 0; i < _height; ++i) {
-      delete[] _information_map[i];
-    }
-    delete[] this->_information_map;
-    this->_information_map = nullptr;
-  }
-  if (_origin_map) {
-    for (int i = 0; i < _height; ++i) {
-      delete[] _origin_map[i];
-    }
-    delete[] this->_origin_map;
-    this->_origin_map = nullptr;
-  }
+
 }

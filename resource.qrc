@@ -6,5 +6,6 @@
         <file>stench.png</file>
         <file>breeze.png</file>
         <file>gold.png</file>
+        <file>background.png</file>
     </qresource>
 </RCC>

@@ -22,13 +22,15 @@ void DrawBoard::paintEvent(QPaintEvent *) {
   QImage image_wumpus;
   image_wumpus.load(":/resource/image/wumpus.png");
   QImage image_background;
-  image_background.load(":/resource/image/gold.png");
+  image_background.load(":/resource/image/background.png");
   QImage image_gold;
   image_gold.load(":/resource/image/gold.png");
   QImage image_breeze;
   image_breeze.load(":/resource/image/breeze.png");
   QImage image_stench;
   image_stench.load(":/resource/image/stench.png");
+  QImage image_brave;
+  image_brave.load(":/resource/image/Brave.png");
   qp.begin(this);
   for (int i = 0; i < 12; ++i) {
     for (int j = 0; j < 12; ++j) {
@@ -37,28 +39,54 @@ void DrawBoard::paintEvent(QPaintEvent *) {
   }
   /*
   for(int i = 0; i <= 4; ++i) {
-    qp.drawLine();
+    qp.drawLine(i * 32 * 3, 0, )
   }
   */
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
+      if(information_map[i][j].is_unknown == TriState::Yes) {
+        continue;
+      }
       if (information_map[i][j].is_pit == TriState::Yes) {
-        qp.drawImage(32 * 3 * i + 32, 32 * 3 * j + 32, image_pit);
+        qp.drawImage(32 * 3 * j + 32, 32 * 3 * i + 32, image_pit);
       }
       if (information_map[i][j].is_wumpus == TriState::Yes) {
-        qp.drawImage(32 * 3 * i + 32, 32 * 3 * j + 32, image_wumpus);
+        qp.drawImage(32 * 3 * j + 32, 32 * 3 * i + 32, image_wumpus);
       }
       if (information_map[i][j].is_breeze == TriState::Yes) {
-        qp.drawImage(32 * 3 * i, 32 * 3 * j, image_breeze);
+        qp.drawImage(32 * 3 * j, 32 * 3 * i, image_breeze);
       }
       if (information_map[i][j].is_stench == TriState::Yes) {
-        qp.drawImage(32 * 3 * i + 32 + 32, 32 * 3 * j, image_stench);
+        qp.drawImage(32 * 3 * j + 32 + 32, 32 * 3 * i, image_stench);
       }
       if (information_map[i][j].is_gold == TriState::Yes) {
-        qp.drawImage(32 * 3 * i + 32 + 32, 32 * 3 * j + 32, image_gold);
+        qp.drawImage(32 * 3 * j + 32 + 32, 32 * 3 * i + 32, image_gold);
       }
       if (information_map[i][j].is_player == TriState::Yes) {
-        // qp.drawImage(32 * 3 * i + 32 + 32, 32 * 3 * j + 32, image_gold);
+        QRectF target(32 * 3 * j + 32, 32 * 3 * i + 32,32, 32);
+        QRectF source;
+        auto direction = player->get_direction(nullptr, nullptr);
+        // Down
+        // Left
+        // Right
+        // Up
+        source.setWidth(32);
+        source.setHeight(32);
+        switch(direction) {
+        case Direction::Down:
+            source.setY(0);
+            break;
+        case Direction::Left:
+            source.setY(32);
+            break;
+        case Direction::Right:
+            source.setY(64);
+            break;
+        case Direction::Up:
+            source.setY(96);
+            break;
+        }
+        qp.drawImage(target, image_brave, source);
       }
     }
   }
@@ -67,4 +95,8 @@ void DrawBoard::paintEvent(QPaintEvent *) {
 
 void DrawBoard::set_map(Block **information_map) {
   this->information_map = information_map;
+}
+
+void DrawBoard::set_player(Player* player) {
+  this->player = player;
 }

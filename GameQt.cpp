@@ -1,8 +1,8 @@
 #include "GameQt.h"
 GameQt::GameQt() {}
 void GameQt::event_handler(Event event) {
-  int test;
-  test = 0;
+    Database::_tell(event);
 }
 
 int **GameQt::get_map() { return _game_map; }
+Player *GameQt::get_player() { return _player; }
