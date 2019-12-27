@@ -12,6 +12,7 @@ private:
   int _action_count;
   bool _is_grab_gold;
   int _state;
+  void _set_direction(Direction);
 
 public:
   bool is_dead;
@@ -29,7 +30,6 @@ public:
   int grab();
   void turn_left();
   void turn_right();
-  void set_direction(Direction);
   void grab_gold();
   void add_action_count();
   // Smell smell();

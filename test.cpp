@@ -16,6 +16,7 @@ void GameCli::event_handler(Event event) {
   int grab_gold = 0;
   int dead = 0;
   switch (event) {
+  case Event::Safe:
   case Event::Arrived:
   case Event::None:
     cout << "Nothing happens." << endl;

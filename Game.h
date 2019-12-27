@@ -5,12 +5,14 @@
 #include "Player.h"
 #include "Wumpus.h"
 #include <complex>
+#include <deque>
 #include <iostream>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
 using std::cin;
 using std::cout;
+using std::deque;
 using std::endl;
 
 enum class Smell : int {
@@ -47,6 +49,7 @@ enum class Event : int {
   SmellPit = 11,
   GameOver = 12,
   Arrived = 13,
+  Safe = 14,
 };
 enum class TriState : int {
   Unknown = 0,
@@ -68,7 +71,6 @@ public:
   Block();
 };
 
-
 class Game {
 protected:
   int **_game_map;
@@ -85,6 +87,7 @@ protected:
   int _arrow_count;
   Block **_information_map;
   Block **_view_map;
+  deque<Action> _action_queue;
   int DEFAULT_ARROW_COUNT;
   int DEFAULT_WIDTH;      // = 4;
   int DEFAULT_HEIGHT;     // = 4;
@@ -101,6 +104,7 @@ public:
   void print_map();
   void set_direction(Direction);
   bool is_over();
+  void add_action_to_queue(Action action);
   Event take_action(Action action, int *data = nullptr);
   Event move(int from_x, int from_y, int x, int y);
   virtual void event_handler(Event event) = 0;

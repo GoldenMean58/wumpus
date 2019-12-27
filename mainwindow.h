@@ -3,12 +3,13 @@
 
 #include "GameQt.h"
 #include "drawboard.h"
+#include <QCheckBox>
+#include <QKeyEvent>
 #include <QMainWindow>
+#include <QMessageBox>
 #include <QPainter>
 #include <QPushButton>
 #include <QVBoxLayout>
-#include <QKeyEvent>
-#include <QCheckBox>
 
 namespace Ui {
 class MainWindow;
@@ -20,7 +21,7 @@ class MainWindow : public QMainWindow {
 public:
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
-  virtual void keyPressEvent(QKeyEvent*);
+  virtual void keyPressEvent(QKeyEvent *);
 
 private slots:
   void random_layout_btn_clicked(bool);

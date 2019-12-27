@@ -15,7 +15,7 @@ Direction Player::get_direction(int *dx, int *dy) {
     return Direction::Left;
   return Direction::Right;
 }
-void Player::set_direction(Direction new_direction) {
+void Player::_set_direction(Direction new_direction) {
   switch (new_direction) {
   case Direction::Up:
     this->_dx = -1;
@@ -44,16 +44,16 @@ void Player::turn_left() {
   Direction old = get_direction(&dx, &dy);
   switch (old) {
   case Direction::Up:
-    set_direction(Direction::Left);
+    _set_direction(Direction::Left);
     break;
   case Direction::Down:
-    set_direction(Direction::Right);
+    _set_direction(Direction::Right);
     break;
   case Direction::Left:
-    set_direction(Direction::Down);
+    _set_direction(Direction::Down);
     break;
   case Direction::Right:
-    set_direction(Direction::Up);
+    _set_direction(Direction::Up);
     break;
   }
 }
@@ -62,16 +62,16 @@ void Player::turn_right() {
   Direction old = get_direction(&dx, &dy);
   switch (old) {
   case Direction::Up:
-    set_direction(Direction::Right);
+    _set_direction(Direction::Right);
     break;
   case Direction::Down:
-    set_direction(Direction::Left);
+    _set_direction(Direction::Left);
     break;
   case Direction::Left:
-    set_direction(Direction::Up);
+    _set_direction(Direction::Up);
     break;
   case Direction::Right:
-    set_direction(Direction::Down);
+    _set_direction(Direction::Down);
     break;
   }
 }
