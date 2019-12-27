@@ -44,7 +44,7 @@ void DrawBoard::paintEvent(QPaintEvent *) {
   */
   for (int i = 0; i < 4; ++i) {
     for (int j = 0; j < 4; ++j) {
-      if(information_map[i][j].is_unknown == TriState::Yes) {
+      if (information_map[i][j].is_unknown == TriState::Yes) {
         continue;
       }
       if (information_map[i][j].is_pit == TriState::Yes) {
@@ -63,28 +63,26 @@ void DrawBoard::paintEvent(QPaintEvent *) {
         qp.drawImage(32 * 3 * j + 32 + 32, 32 * 3 * i + 32, image_gold);
       }
       if (information_map[i][j].is_player == TriState::Yes) {
-        QRectF target(32 * 3 * j + 32, 32 * 3 * i + 32,32, 32);
+        QRectF target(32 * 3 * j + 32, 32 * 3 * i + 32, 32, 32);
         QRectF source;
         auto direction = player->get_direction(nullptr, nullptr);
         // Down
         // Left
         // Right
         // Up
-        source.setWidth(32);
-        source.setHeight(32);
-        switch(direction) {
+        switch (direction) {
         case Direction::Down:
-            source.setY(0);
-            break;
+          source.setRect(0, 0, 32, 32);
+          break;
         case Direction::Left:
-            source.setY(32);
-            break;
+          source.setRect(0, 32, 32, 32);
+          break;
         case Direction::Right:
-            source.setY(64);
-            break;
+          source.setRect(0, 64, 32, 32);
+          break;
         case Direction::Up:
-            source.setY(96);
-            break;
+          source.setRect(0, 96, 32, 32);
+          break;
         }
         qp.drawImage(target, image_brave, source);
       }
@@ -97,6 +95,4 @@ void DrawBoard::set_map(Block **information_map) {
   this->information_map = information_map;
 }
 
-void DrawBoard::set_player(Player* player) {
-  this->player = player;
-}
+void DrawBoard::set_player(Player *player) { this->player = player; }
