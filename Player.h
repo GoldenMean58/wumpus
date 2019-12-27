@@ -30,6 +30,7 @@ public:
   int grab();
   void turn_left();
   void turn_right();
+  void set_arrow_count(int count);
   void grab_gold();
   void add_action_count();
   // Smell smell();

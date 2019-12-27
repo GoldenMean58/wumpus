@@ -34,7 +34,8 @@ SOURCES += \
     Player.cpp \
     Wumpus.cpp \
     drawboard.cpp \
-    GameQt.cpp
+    GameQt.cpp \
+    dialog.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -45,10 +46,12 @@ HEADERS += \
     Player.h \
     Wumpus.h \
     drawboard.h \
-    GameQt.h
+    GameQt.h \
+    dialog.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    dialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

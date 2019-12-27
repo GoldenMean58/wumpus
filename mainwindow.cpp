@@ -63,19 +63,37 @@ void MainWindow::random_layout_btn_clicked(bool) {
   db->set_player(game_qt->get_player());
   db->update();
 }
-void MainWindow::custom_layout_btn_clicked(bool) { exit(1); }
+void MainWindow::custom_layout_btn_clicked(bool) {
+    db->set_map(nullptr);
+    if(game_qt) {
+        delete game_qt;
+        game_qt = nullptr;
+    }
+    game_qt = new GameQt();
+    game_qt->generate_map(false);
+    Dialog dlg(game_qt);
+    dlg.exec();
+    if(dlg.ok) {
+      int start_x = game_qt->get_player()->get_x();
+      int start_y = game_qt->get_player()->get_y();
+      game_qt->move(start_x, start_y, start_x, start_y);
+      db->set_map(game_qt->extract_map_info(is_debug));
+      db->set_player(game_qt->get_player());
+      db->update();
+    }
+}
 void MainWindow::ai_btn_clicked(bool) {
   if (game_qt->is_over())
     return;
   int data[10];
   Action action = game_qt->ask(data);
   auto event = game_qt->take_action(action, data);
-  if (event == Event::GameOver) {
-    game_over();
-  }
   db->set_map(game_qt->extract_map_info(is_debug));
   db->set_player(game_qt->get_player());
   db->update();
+  if (event == Event::GameOver) {
+    game_over();
+  }
 }
 
 MainWindow::~MainWindow() {

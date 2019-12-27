@@ -214,6 +214,7 @@ void Database::_tell(Event event) {
         tmp_y += dy;
       }
     }
+    smell(x, y);
     break;
   case Event::Leaved:
     break;
@@ -694,8 +695,8 @@ Action Database::ask(int *data) {
     for (int y = 0; y < _width; ++y) {
       if (_information_map[x][y].is_safe == TriState::Unknown &&
           _information_map[x][y].is_visited == TriState::No) {
-        _moveto(x, y);
-        return Action::None;
+        if(_moveto(x, y))
+          return Action::None;
       }
     }
   }

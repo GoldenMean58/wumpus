@@ -62,7 +62,7 @@ void DrawBoard::paintEvent(QPaintEvent *) {
       if (information_map[i][j].is_gold == TriState::Yes) {
         qp.drawImage(32 * 3 * j + 32 + 32, 32 * 3 * i + 32, image_gold);
       }
-      if (information_map[i][j].is_player == TriState::Yes) {
+      if (information_map[i][j].is_player == TriState::Yes && player) {
         QRectF target(32 * 3 * j + 32, 32 * 3 * i + 32, 32, 32);
         QRectF source;
         auto direction = player->get_direction(nullptr, nullptr);

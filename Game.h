@@ -98,9 +98,17 @@ public:
   Game();
   ~Game();
   Game(int **map, int width, int height, int arrow_count, int pit_count);
-  void generate_map();
+  void generate_map(bool is_random_build);
   void generate_map(int width, int height);
   void destroy_map();
+  void empty_map();
+  int get_height();
+  int get_width();
+  void place_none(int x, int y);
+  void place_brave(int x, int y);
+  void place_pit(int x, int y);
+  void place_wumpus(int x, int y);
+  void place_gold(int x, int y);
   void print_map();
   void set_direction(Direction);
   bool is_over();

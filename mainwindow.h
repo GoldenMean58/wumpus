@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "GameQt.h"
+#include "dialog.h"
 #include "drawboard.h"
 #include <QCheckBox>
 #include <QKeyEvent>

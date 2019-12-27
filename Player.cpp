@@ -106,4 +106,7 @@ Player::Player() : _arrow_count(1) { init(); }
 Player::Player(int arrow_count) : _arrow_count(arrow_count) { init(); }
 void Player::grab_gold() { _is_grab_gold = true; }
 void Player::add_action_count() { _action_count++; }
+void Player::set_arrow_count(int count){
+    _arrow_count = count;
+}
 // Smell Player::smell() {}
