@@ -22,6 +22,7 @@ public:
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
   virtual void keyPressEvent(QKeyEvent *);
+  void game_over();
 
 private slots:
   void random_layout_btn_clicked(bool);

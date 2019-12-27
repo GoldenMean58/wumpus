@@ -24,6 +24,28 @@ MainWindow::MainWindow(QWidget *parent)
   layout->addWidget(debug_check_box);
   ui->centralWidget->setLayout(layout);
 }
+
+void MainWindow::game_over() {
+  int score = 0;
+  int grab_gold = 0;
+  int dead = 0;
+  Player *player = game_qt->get_player();
+  if (player->is_grab_gold())
+    grab_gold = 1000;
+  score += grab_gold;
+  score -= player->get_action_count();
+  score -= DEFAULT_ARROW_COUNT - player->get_arrow_count();
+  if (player->is_dead)
+    dead -= 1000;
+  score += dead;
+  QString prompt =
+      "Game over! Score = (Grab gold?) " + QString::number(grab_gold) +
+      " + (dead?) " + QString::number(dead) + " - (step) " +
+      QString::number(player->get_action_count()) + " - (arrow used) " +
+      QString::number(DEFAULT_ARROW_COUNT - player->get_arrow_count()) + " = " +
+      QString::number(score);
+  QMessageBox::information(this, "Game Over", prompt);
+}
 void MainWindow::debug_check_box_state_changed(int state) {
   is_debug = state;
   db->set_map(game_qt->extract_map_info(is_debug));
@@ -49,25 +71,7 @@ void MainWindow::ai_btn_clicked(bool) {
   Action action = game_qt->ask(data);
   auto event = game_qt->take_action(action, data);
   if (event == Event::GameOver) {
-    int score = 0;
-    int grab_gold = 0;
-    int dead = 0;
-    Player *player = game_qt->get_player();
-    if (player->is_grab_gold())
-      grab_gold = 1000;
-    score += grab_gold;
-    score -= player->get_action_count();
-    score -= DEFAULT_ARROW_COUNT - player->get_arrow_count();
-    if (player->is_dead)
-      dead -= 1000;
-    score += dead;
-    QString prompt =
-        "Game over! Score = (Grab gold?) " + QString::number(grab_gold) +
-        " + (dead?) " + QString::number(dead) + " - (step) " +
-        QString::number(player->get_action_count()) + " - (arrow used) " +
-        QString::number(DEFAULT_ARROW_COUNT - player->get_arrow_count()) +
-        " = " + QString::number(score);
-    QMessageBox::information(this, "Game Over", prompt);
+    game_over();
   }
   db->set_map(game_qt->extract_map_info(is_debug));
   db->set_player(game_qt->get_player());
@@ -81,6 +85,8 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
+  if (game_qt->is_over())
+    return;
   int key = event->key();
   Event game_event;
   switch (key) {
@@ -108,6 +114,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
   db->set_map(game_qt->extract_map_info(is_debug));
   db->update();
   if (game_event == Event::GameOver) {
-    exit(0);
+    game_over();
   }
 }
