@@ -1,5 +1,5 @@
 #include "AI.h"
-bool Database::_moveto(int goal_x, int goal_y) {
+int Database::_moveto(int goal_x, int goal_y) {
   /*
    * Find a safe path to (x, y) and move there by dfs
    * if there is no safe path, then return false, else true.
@@ -7,7 +7,7 @@ bool Database::_moveto(int goal_x, int goal_y) {
   int origin_x = _player->get_x();
   int origin_y = _player->get_y();
   if (origin_x == goal_x && origin_y == goal_y)
-    return true;
+    return (int)_player->get_direction(nullptr, nullptr);
   int path[_height * _width];
   bool visited[_height * _width];
   for (int i = 0; i < _height; ++i) {
@@ -69,7 +69,8 @@ bool Database::_moveto(int goal_x, int goal_y) {
         direction = new_direction;
         add_action_to_queue(Action::MoveForward);
       }
-      return true;
+      cout << (int)direction << endl;
+      return (int)direction;
     }
     int up_x = x - 1;
     int up_y = y;
@@ -108,7 +109,7 @@ bool Database::_moveto(int goal_x, int goal_y) {
       path[right_x * _width + right_y] = x * _width + y;
     }
   }
-  return false;
+  return -1;
 }
 void Database::event_handler(Event event) {
   _tell(event);
@@ -589,7 +590,6 @@ Action Database::ask(int *data) {
   }
   int player_x = _player->get_x();
   int player_y = _player->get_y();
-  auto now_direction = _player->get_direction(nullptr, nullptr);
   if (_player->get_arrow_count() > 0) {
     for (int x = 0; x < _height; ++x) {
       for (int y = 0; y < _width; ++y) {
@@ -598,7 +598,7 @@ Action Database::ask(int *data) {
           for (int now_x = player_x; now_x < _height; ++now_x) {
             int xx = now_x % _height;
             if (_information_map[xx][y].is_safe == TriState::Yes) {
-              move(player_x, player_y, xx, y);
+              Direction now_direction = (Direction)_moveto(xx, y);
               auto direction = x < xx ? Direction::Up : Direction::Down;
               for (int turn_times = 0;
                    turn_times < abs((int)now_direction - (int)direction);
@@ -610,17 +610,13 @@ Action Database::ask(int *data) {
                 }
               }
               cout << "Shoot (" << x << ", " << y << ")" << endl;
-              if (_player->get_arrow_count() == 0)
-                exit(0);
               return Action::Shoot;
             }
           }
           for (int now_y = player_y; now_y < _width; ++now_y) {
             int yy = now_y % _width;
             if (_information_map[x][yy].is_safe == TriState::Yes) {
-              int player_x = _player->get_x();
-              int player_y = _player->get_y();
-              move(player_x, player_y, x, yy);
+              Direction now_direction = (Direction)_moveto(x, yy);
               auto direction = y < yy ? Direction::Left : Direction::Right;
               for (int turn_times = 0;
                    turn_times < abs((int)now_direction - (int)direction);
@@ -632,8 +628,6 @@ Action Database::ask(int *data) {
                 }
               }
               cout << "Shoot (" << x << ", " << y << ")" << endl;
-              if (_player->get_arrow_count() == 0)
-                exit(0);
               return Action::Shoot;
             }
           }
@@ -650,7 +644,7 @@ Action Database::ask(int *data) {
           for (int now_x = player_x; now_x < _height + player_x; ++now_x) {
             int xx = now_x % _height;
             if (_information_map[xx][y].is_safe == TriState::Yes) {
-              move(player_x, player_y, xx, y);
+              Direction now_direction = (Direction)_moveto(xx, y);
               auto direction = x < xx ? Direction::Up : Direction::Down;
               for (int turn_times = 0;
                    turn_times < abs((int)now_direction - (int)direction);
@@ -662,15 +656,13 @@ Action Database::ask(int *data) {
                 }
               }
               cout << "Shoot (" << x << ", " << y << ") maybe" << endl;
-              if (_player->get_arrow_count() == 0)
-                exit(0);
               return Action::Shoot;
             }
           }
           for (int now_y = player_y; now_y < _width + player_y; ++now_y) {
             int yy = now_y % _width;
             if (_information_map[x][yy].is_safe == TriState::Yes) {
-              move(player_x, player_y, x, yy);
+              Direction now_direction = (Direction)_moveto(x, yy);
               auto direction = y < yy ? Direction::Left : Direction::Right;
               for (int turn_times = 0;
                    turn_times < abs((int)now_direction - (int)direction);
@@ -682,8 +674,6 @@ Action Database::ask(int *data) {
                 }
               }
               cout << "Shoot (" << x << ", " << y << ") maybe" << endl;
-              if (_player->get_arrow_count() == 0)
-                exit(0);
               return Action::Shoot;
             }
           }
@@ -695,7 +685,7 @@ Action Database::ask(int *data) {
     for (int y = 0; y < _width; ++y) {
       if (_information_map[x][y].is_safe == TriState::Unknown &&
           _information_map[x][y].is_visited == TriState::No) {
-        if(_moveto(x, y))
+        if (_moveto(x, y))
           return Action::None;
       }
     }

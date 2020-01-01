@@ -58,8 +58,8 @@ void Game::generate_map(bool is_random_build = true) {
       _game_map[x][y] = (int)ObjectType::None;
     }
   }
-  if(!is_random_build)
-      return;
+  if (!is_random_build)
+    return;
   _pit = new Pit[DEFAULT_PITS_COUNT];
   while (_pit_count < DEFAULT_PITS_COUNT) {
     int index = rand() % (_width * _height - 1) + 1;
@@ -308,6 +308,7 @@ Event Game::take_action(Action action, int *data) {
     break;
   case Action::Shoot:
     if (_player->get_arrow_count() > 0) {
+      cout << "Shoot action" << endl;
       _player->shoot();
       int tmp_x = x;
       int tmp_y = y;
@@ -448,8 +449,8 @@ Block **Game::extract_map_info(bool debug) {
       }
     }
   }
-  if(_gold_x < 0 || _gold_y < 0) {
-      return info;
+  if (_gold_x < 0 || _gold_y < 0) {
+    return info;
   }
   if (_player->is_grab_gold()) {
     info[_gold_x][_gold_y].is_gold = TriState::No;
@@ -459,11 +460,11 @@ Block **Game::extract_map_info(bool debug) {
   return info;
 }
 void Game::empty_map() {
-    for(int i = 0 ; i < _height; ++i) {
-        for(int j = 0 ; j < _width; ++j) {
-            place_none(i, j);
-        }
+  for (int i = 0; i < _height; ++i) {
+    for (int j = 0; j < _width; ++j) {
+      place_none(i, j);
     }
+  }
 }
 void Game::place_none(int x, int y) {
   this->_game_map[x][y] = (int)ObjectType::None;
@@ -476,21 +477,21 @@ void Game::place_brave(int x, int y) {
   this->_player->move_to(x, y);
 }
 void Game::place_pit(int x, int y) {
-    if(!_pit) {
-        _pit = new Pit[_height * _width];
-    }
-    _pit[_pit_count].set_x(x);
-    _pit[_pit_count].set_y(y);
-    _pit_count++;
+  if (!_pit) {
+    _pit = new Pit[_height * _width];
+  }
+  _pit[_pit_count].set_x(x);
+  _pit[_pit_count].set_y(y);
+  _pit_count++;
   this->_game_map[x][y] = (int)ObjectType::PitType;
 }
 void Game::place_wumpus(int x, int y) {
-    if(!_wumpus) {
-        _wumpus= new Wumpus[_height * _width];
-    }
-    _wumpus[_pit_count].set_x(x);
-    _wumpus[_pit_count].set_y(y);
-    _wumpus_count++;
+  if (!_wumpus) {
+    _wumpus = new Wumpus[_height * _width];
+  }
+  _wumpus[_pit_count].set_x(x);
+  _wumpus[_pit_count].set_y(y);
+  _wumpus_count++;
   _player->set_arrow_count(_wumpus_count);
   _arrow_count = _wumpus_count;
   this->_game_map[x][y] = (int)ObjectType::WumpusType;
@@ -500,9 +501,5 @@ void Game::place_gold(int x, int y) {
   this->_gold_y = y;
 }
 
-int Game::get_height() {
-    return _height;
-}
-int Game::get_width() {
-    return _width;
-}
+int Game::get_height() { return _height; }
+int Game::get_width() { return _width; }

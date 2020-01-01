@@ -9,9 +9,11 @@ using std::vector;
 
 class Database : public Game {
 private:
-  bool _moveto(int x, int y);
+  int _moveto(int x, int y);
+
 protected:
   void _tell(Event event);
+
 public:
   // Update
   void event_handler(Event event) override; // Tell
